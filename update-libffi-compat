@@ -1,0 +1,15 @@
+#!/bin/bash
+if [[ $(whoami) == "root" ]] ; then
+    ffi_include_dir=$(pkg-config --cflags libffi | grep -e '-I.*/include' | sed -e's/-I//' | sed -e's/ .*//g')
+    for i in $ffi_include_dir/*.h; do
+        dest=/usr/include/$(basename $i)
+        if [[ -h $dest || ! -f $dest ]] ; then
+            if [[ -h $dest ]] ; then
+                unlink $dest
+            fi
+            ln -s -T $i $dest
+        fi
+    done
+else
+    echo "Must be executed as root"
+fi
